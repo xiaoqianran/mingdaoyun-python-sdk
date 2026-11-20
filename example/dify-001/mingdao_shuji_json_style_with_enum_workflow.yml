@@ -1,0 +1,269 @@
+app:
+  description: 零输入：common + apis JSON 字典，动态构造 URL 和 Body
+  icon: 📚
+  icon_background: '#E4E8FF'
+  mode: workflow
+  name: 明道云 shuji V2 JSON示例集
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.3.1
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+  graph:
+    edges:
+    - id: start-builder
+      type: custom
+      source: start
+      target: builder
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: start
+        targetType: code
+        isInIteration: false
+    - id: builder-http
+      type: custom
+      source: builder
+      target: http
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: code
+        targetType: http-request
+        isInIteration: false
+    - id: http-end
+      type: custom
+      source: http
+      target: end
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: http-request
+        targetType: end
+        isInIteration: false
+    nodes:
+    - id: start
+      type: custom
+      position:
+        x: 80
+        y: 240
+      positionAbsolute:
+        x: 80
+        y: 240
+      width: 244
+      height: 54
+      data:
+        type: start
+        title: 开始（零输入）
+        desc: ''
+        variables: []
+    - id: builder
+      type: custom
+      position:
+        x: 385
+        y: 220
+      positionAbsolute:
+        x: 385
+        y: 220
+      width: 244
+      height: 90
+      data:
+        type: code
+        title: shuji API 示例集（28 种）
+        desc: 在代码顶部切换 API；零输入
+        code_language: python3
+        code: "\"\"\"Dify Python Code 节点：零输入，明道云 shuji 工作表 V2 API JSON 风格示例集。\n\n每个示例的 JSON 参数独立展示；只需修改 api 选择要调用的示例。\nHTTP\
+          \ Request: POST / URL={{Python.url}} / JSON Body={{Python.body}}\n注意：部分场景需要填写真实 rowId、关联字段 ID 或附件 Base64。\n\"\"\"\
+          \nimport json\n\n\ndef main() -> dict:\n    # 1. API 选项枚举：取消某行前的 #，并保证只有一行 api 生效\n    # ===== 工作表结构 =====\n   \
+          \ api = \"getWorksheetInfo\"  # 获取书籍工作表的字段结构\n    # ===== 查询与分页 =====\n    #api = \"getFilterRows\"  # 查询第一页记录\n\
+          \    #api = \"getFilterRows__page2\"  # 查询第二页记录\n    #api = \"getFilterRows__sort_name_asc\"  # 按名称升序查询\n    #api\
+          \ = \"getFilterRows__sort_name_desc\"  # 按名称降序查询\n    #api = \"getFilterRows__name_contains\"  # 筛选名称包含 Python 的记录\n\
+          \    #api = \"getFilterRows__name_equals\"  # 筛选名称等于指定值的记录\n    #api = \"getFilterRows__dec_not_empty\"  # 筛选描述不为空的记录\n\
+          \    #api = \"getFilterRows__name_and_dec\"  # 名称和描述组合筛选\n    #api = \"getRowByIdPost\"  # 根据记录 ID 查询单条记录\n    #\
+          \ ===== 数量统计 =====\n    #api = \"getFilterRowsTotalNum\"  # 统计全部记录数量\n    #api = \"getFilterRowsTotalNum__name_contains\"\
+          \  # 统计名称包含 Python 的记录数\n    # ===== 关联记录 =====\n    #api = \"getRowRelations\"  # 读取关联记录（本表暂无关联字段）\n    # =====\
+          \ 新增记录 =====\n    #api = \"addRow\"  # 新增一条书籍记录\n    #api = \"addRow__name_only\"  # 仅填写书名新增\n    #api = \"addRow__with_xlsx\"\
+          \  # 新增记录并上传 Excel 附件\n    #api = \"addRow__with_two_files\"  # 新增记录并上传两个附件\n    #api = \"addRows\"  # 批量新增两条记录\n\
+          \    #api = \"addRows__name_only\"  # 批量新增只有名称的记录\n    # ===== 修改记录 =====\n    #api = \"editRow\"  # 同时修改名称、描述和附件\n\
+          \    #api = \"editRow__dec_only\"  # 只修改描述\n    #api = \"editRow__replace_xlsx\"  # 覆盖现有 Excel 附件\n    #api = \"\
+          editRow__append_xlsx\"  # 保留旧附件并追加 Excel\n    #api = \"editRow__name_and_xlsx\"  # 同时修改名称和 Excel 附件\n    #api =\
+          \ \"editRows\"  # 批量修改描述\n    #api = \"editRows__rename\"  # 批量修改名称\n    # ===== 删除记录 =====\n    #api = \"deleteRow\"\
+          \  # 删除一条记录\n    #api = \"deleteRow__multiple\"  # 删除多条记录\n    host = \"https://api.mingdao.com\"           # 主域名\n\
+          \    prefix = \"/v2/open/worksheet/\"              # V2 工作表 API 路径\n\n    # 2. 公共 JSON（请替换密钥；生产环境建议使用 Dify Secret）\n\
+          \    common = {\n        \"appKey\": \"替换为你的AppKey\",\n        \"sign\": \"替换为你的Sign\",\n        \"worksheetId\"\
+          : \"shuji\",             # 工作表别名\n        \"triggerWorkflow\": False               # 修改数据时不触发自动化\n    }\n\n    #\
+          \ ============================================================\n    # 数字参数枚举说明\n    # ============================================================\n\
+          \n    # 1. dataType：控件类型（对应 getWorksheetInfo 的 type）\n    # ------------------------------------------------------------\n\
+          \    #  0 = 未定义\n    #  1 = 单行文本\n    #  2 = 多行文本\n    #  3 = 手机\n    #  4 = 座机\n    #  5 = 邮箱\n    #  6 = 数值\n\
+          \    #  7 = 证件\n    #  8 = 金额\n    #  9 = 单选平铺\n    # 10 = 多选\n    # 11 = 单选下拉\n    # 14 = 附件\n    # 15 = 日期\n \
+          \   # 16 = 日期时间\n    # 26 = 成员\n    # 27 = 部门\n    # 29 = 关联记录\n    # shuji：name = 2，dec = 2，fujian = 14\n\n   \
+          \ # 2. spliceType：筛选条件关系\n    # ------------------------------------------------------------\n    # 0 = 未定义\n  \
+          \  # 1 = AND（且）\n    # 2 = OR（或）\n\n    # 3. filterType：筛选方式\n    # ------------------------------------------------------------\n\
+          \    #  0 = 默认\n    #  1 = 包含\n    #  2 = 等于\n    #  3 = 开头为\n    #  4 = 结尾为\n    #  5 = 不包含\n    #  6 = 不等于\n \
+          \   #  7 = 为空\n    #  8 = 不为空\n    # 11 = 范围内\n    # 12 = 范围外\n    # 13 = 大于\n    # 14 = 大于等于\n    # 15 = 小于\n \
+          \   # 16 = 小于等于\n    # 17 = 日期是\n    # 18 = 日期不是\n    # 24 = 关联是\n    # 25 = 关联不是\n    # 31 = 日期范围内\n    # 32 =\
+          \ 日期范围外\n    # 33 = 日期大于\n    # 34 = 日期大于等于\n    # 35 = 日期小于\n    # 36 = 日期小于等于\n\n    # 4. valueType：附件来源\n   \
+          \ # ------------------------------------------------------------\n    # 0 = 未定义\n    # 1 = URL\n    # 2 = Base64\n\
+          \n    # 5. editType：附件更新方式\n    # ------------------------------------------------------------\n    # 0 = 覆盖原附件\n\
+          \    # 1 = 追加新附件\n    # 2 = 未定义\n\n    # 6. notGetTotal：是否跳过记录总数统计\n    # ------------------------------------------------------------\n\
+          \    # 0 = 不跳过（计算总数）\n    # 1 = 跳过（提高查询效率）\n\n    # 7. isAsc：排序方向\n    # ------------------------------------------------------------\n\
+          \    # True  = 升序\n    # False = 降序\n\n    # 8. triggerWorkflow：是否触发明道云自动化\n    # ------------------------------------------------------------\n\
+          \    # True  = 触发\n    # False = 不触发\n\n    # 3. 每个示例的业务 JSON：name / dec / fujian 都是字段别名\n    # 以下示例中的记录 ID 是占位符，不能直接拿来操作真实记录。\n\
+          \    apis = {\n        # ===== A. 获取结构 =====\n        \"getWorksheetInfo\": {},\n\n        # 筛选参数速查：dataType=2 文本；spliceType=1\
+          \ 且(AND)；filterType=1 包含、2 等于、8 非空\n    # ===== B. 读取与分页 =====\n        \"getFilterRows\": {\n            \"pageSize\"\
+          : 10,\n            \"pageIndex\": 1,\n            \"notGetTotal\": 1,\n            \"filters\": []\n        },\n\
+          \        \"getFilterRows__page2\": {\n            \"pageSize\": 10,\n            \"pageIndex\": 2,\n           \
+          \ \"notGetTotal\": 1,\n            \"filters\": []\n        },\n        \"getFilterRows__sort_name_asc\": {\n  \
+          \          \"pageSize\": 10,\n            \"pageIndex\": 1,\n            \"sortId\": \"name\",                 \
+          \  # 按书名排序\n            \"isAsc\": True,\n            \"filters\": []\n        },\n        \"getFilterRows__sort_name_desc\"\
+          : {\n            \"pageSize\": 10,\n            \"pageIndex\": 1,\n            \"sortId\": \"name\",\n         \
+          \   \"isAsc\": False,\n            \"filters\": []\n        },\n        \"getFilterRows__name_contains\": {\n  \
+          \          \"pageSize\": 10,\n            \"pageIndex\": 1,\n            \"filters\": [{\n                \"controlId\"\
+          : \"name\",\n                \"dataType\": 2,                  # 文本字段\n                \"spliceType\": 1,  # 且（AND）\n\
+          \                \"filterType\": 1,                # contains（包含）\n                \"value\": \"Python\"\n     \
+          \       }]\n        },\n        \"getFilterRows__name_equals\": {\n            \"pageSize\": 10,\n            \"\
+          pageIndex\": 1,\n            \"filters\": [{\n                \"controlId\": \"name\",\n                \"dataType\"\
+          : 2,  # 文本字段\n                \"spliceType\": 1,  # 且（AND）\n                \"filterType\": 2,                #\
+          \ 等于\n                \"value\": \"机器学习\"\n            }]\n        },\n        \"getFilterRows__dec_not_empty\"\
+          : {\n            \"pageSize\": 10,\n            \"pageIndex\": 1,\n            \"filters\": [{\n               \
+          \ \"controlId\": \"dec\",\n                \"dataType\": 2,  # 文本字段\n                \"spliceType\": 1,  # 且（AND）\n\
+          \                \"filterType\": 8,                # 非空\n                \"value\": \"\"\n            }]\n     \
+          \   },\n        \"getFilterRows__name_and_dec\": {\n            \"pageSize\": 10,\n            \"pageIndex\": 1,\n\
+          \            \"filters\": [\n                {\"controlId\": \"name\", \"dataType\": 2, \"spliceType\": 1,\n   \
+          \              \"filterType\": 1, \"value\": \"Python\"},  # 包含\n                {\"controlId\": \"dec\", \"dataType\"\
+          : 2, \"spliceType\": 1,\n                 \"filterType\": 1, \"value\": \"测试\"}  # 包含\n            ]\n        },\n\
+          \        \"getRowByIdPost\": {\n            \"rowId\": \"填写真实rowId\"\n        },\n\n        # ===== C. 数量统计 =====\n\
+          \        \"getFilterRowsTotalNum\": {\n            \"filters\": []\n        },\n        \"getFilterRowsTotalNum__name_contains\"\
+          : {\n            \"filters\": [{\n                \"controlId\": \"name\", \"dataType\": 2,\n                \"\
+          spliceType\": 1, \"filterType\": 1,  # 且（AND）\n                \"value\": \"Python\"\n            }]\n        },\n\
+          \n        # ===== D. 关联记录（shuji 当前没有关联字段，此项为通用模板） =====\n        \"getRowRelations\": {\n            \"rowId\":\
+          \ \"填写真实rowId\",\n            \"controlId\": \"填写真实关联字段ID\",\n            \"pageSize\": 10,\n            \"pageIndex\"\
+          : 1\n        },\n\n        # ===== E. 新增记录 =====\n        \"addRow\": {\n            \"controls\": [\n         \
+          \       {\"controlId\": \"name\", \"value\": \"Python 数据分析\"},\n                {\"controlId\": \"dec\", \"value\"\
+          : \"Dify 新增的书籍\"}\n            ]\n        },\n        \"addRow__name_only\": {\n            \"controls\": [\n  \
+          \              {\"controlId\": \"name\", \"value\": \"只有书名的新记录\"}\n            ]\n        },\n        \"addRow__with_xlsx\"\
+          : {\n            \"controls\": [\n                {\"controlId\": \"name\", \"value\": \"Excel 报告\"},\n        \
+          \        {\"controlId\": \"dec\", \"value\": \"新增时上传 XLSX\"},\n                {\"controlId\": \"fujian\", \"valueType\"\
+          : 2,\n                 \"controlFiles\": [{\n                     \"baseFile\": \"填写真实XLSX的Base64\",\n         \
+          \            \"fileName\": \"report.xlsx\"\n                 }]}\n            ]\n        },\n        \"addRow__with_two_files\"\
+          : {\n            \"controls\": [\n                {\"controlId\": \"name\", \"value\": \"带两个附件的记录\"},\n        \
+          \        {\"controlId\": \"fujian\", \"valueType\": 2,\n                 \"controlFiles\": [\n                 \
+          \    {\"baseFile\": \"填写第一个文件Base64\", \"fileName\": \"report.xlsx\"},\n                     {\"baseFile\": \"填写第二个文件Base64\"\
+          , \"fileName\": \"notes.xlsx\"}\n                 ]}\n            ]\n        },\n        \"addRows\": {\n      \
+          \      \"rows\": [\n                [{\"controlId\": \"name\", \"value\": \"书籍 A\"},\n                 {\"controlId\"\
+          : \"dec\", \"value\": \"批量新增第一条\"}],\n                [{\"controlId\": \"name\", \"value\": \"书籍 B\"},\n       \
+          \          {\"controlId\": \"dec\", \"value\": \"批量新增第二条\"}]\n            ]\n        },\n        \"addRows__name_only\"\
+          : {\n            \"rows\": [\n                [{\"controlId\": \"name\", \"value\": \"批量书籍 1\"}],\n            \
+          \    [{\"controlId\": \"name\", \"value\": \"批量书籍 2\"}],\n                [{\"controlId\": \"name\", \"value\":\
+          \ \"批量书籍 3\"}]\n            ]\n        },\n\n        # ===== F. 修改记录 =====\n        \"editRow\": {\n           \
+          \ \"rowId\": \"填写真实rowId\",\n            \"controls\": [\n                {\"controlId\": \"name\", \"value\": \"\
+          更新后的名称\"},\n                {\"controlId\": \"dec\", \"value\": \"更新后的描述\"},\n                {\n              \
+          \      \"controlId\": \"fujian\",\n                    \"editType\": 0,  # 0：覆盖附件；1：追加附件\n                    \"\
+          valueType\": 2, # 使用 Base64 上传\n                    \"controlFiles\": [\n                        {\n           \
+          \                 \"baseFile\": \"\",  # 填写 Excel 的完整 Base64\n                            \"fileName\": \"report.xlsx\"\
+          \n                        }\n                    ]\n                }\n            ]\n        },\n        \"editRow__dec_only\"\
+          : {\n            \"rowId\": \"填写真实rowId\",\n            \"controls\": [\n                {\"controlId\": \"dec\"\
+          , \"value\": \"仅更新描述\"}\n            ]\n        },\n        \"editRow__replace_xlsx\": {\n            \"rowId\"\
+          : \"填写真实rowId\",\n            \"controls\": [\n                {\"controlId\": \"fujian\", \"editType\": 0,  # 覆盖已有附件\n\
+          \                 \"valueType\": 2,\n                 \"controlFiles\": [{\n                     \"baseFile\": \"\
+          填写真实XLSX的Base64\",\n                     \"fileName\": \"updated_report.xlsx\"\n                 }]}\n         \
+          \   ]\n        },\n        \"editRow__append_xlsx\": {\n            \"rowId\": \"填写真实rowId\",\n            \"controls\"\
+          : [\n                {\"controlId\": \"fujian\", \"editType\": 1,  # 保留旧附件并追加\n                 \"valueType\": 2,\n\
+          \                 \"controlFiles\": [{\n                     \"baseFile\": \"填写真实XLSX的Base64\",\n              \
+          \       \"fileName\": \"extra_report.xlsx\"\n                 }]}\n            ]\n        },\n        \"editRow__name_and_xlsx\"\
+          : {\n            \"rowId\": \"填写真实rowId\",\n            \"controls\": [\n                {\"controlId\": \"name\"\
+          , \"value\": \"新版报告\"},\n                {\"controlId\": \"fujian\", \"editType\": 0,\n                 \"valueType\"\
+          : 2,\n                 \"controlFiles\": [{\n                     \"baseFile\": \"填写真实XLSX的Base64\",\n         \
+          \            \"fileName\": \"new.xlsx\"\n                 }]}\n            ]\n        },\n        \"editRows\":\
+          \ {\n            \"rowIds\": [\"填写真实rowId1\", \"填写真实rowId2\"],\n            \"control\": {\"controlId\": \"dec\"\
+          , \"value\": \"统一更新描述\"}\n        },\n        \"editRows__rename\": {\n            \"rowIds\": [\"填写真实rowId1\",\
+          \ \"填写真实rowId2\"],\n            \"control\": {\"controlId\": \"name\", \"value\": \"批量统一书名\"}\n        },\n\n  \
+          \      # ===== G. 删除记录 =====\n        \"deleteRow\": {\n            \"rowId\": \"填写真实rowId\"\n        },\n     \
+          \   \"deleteRow__multiple\": {\n            \"rowId\": \"填写真实rowId1,填写真实rowId2\"  # SDK 接口支持逗号分隔\n        }\n  \
+          \  }\n\n    # 4. 统一构造 URL / Body；__ 后仅用于区分示例，不属于接口地址\n    if api not in apis:\n        raise ValueError(\"未知 API\
+          \ 示例: \" + api)\n    endpoint = api.split(\"__\", 1)[0]\n    body = {**common, **apis[api]}\n    return {\n    \
+          \    \"url\": host + prefix + endpoint,\n        \"body\": json.dumps(body, ensure_ascii=False),\n    }\n"
+        variables: []
+        outputs:
+          url:
+            type: string
+            children: null
+          body:
+            type: string
+            children: null
+    - id: http
+      type: custom
+      position:
+        x: 690
+        y: 220
+      positionAbsolute:
+        x: 690
+        y: 220
+      width: 244
+      height: 90
+      data:
+        type: http-request
+        title: HTTP POST
+        desc: URL、JSON Body 由 Code 节点动态提供
+        method: post
+        url: '{{#builder.url#}}'
+        authorization:
+          type: no-auth
+          config: null
+        headers: Content-Type:application/json
+        params: ''
+        body:
+          type: json
+          data:
+          - id: body1
+            key: ''
+            type: text
+            value: '{{#builder.body#}}'
+        timeout:
+          max_connect_timeout: 10
+          max_read_timeout: 60
+          max_write_timeout: 60
+        variables: []
+    - id: end
+      type: custom
+      position:
+        x: 995
+        y: 220
+      positionAbsolute:
+        x: 995
+        y: 220
+      width: 244
+      height: 90
+      data:
+        type: end
+        title: 结束
+        desc: ''
+        outputs:
+        - variable: status_code
+          value_selector:
+          - http
+          - status_code
+        - variable: response
+          value_selector:
+          - http
+          - body
+    viewport:
+      x: 0
+      y: 0
+      zoom: 1
